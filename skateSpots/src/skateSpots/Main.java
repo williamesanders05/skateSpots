@@ -1,5 +1,6 @@
 package skateSpots;
 import java.io.*;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -8,13 +9,13 @@ public class Main {
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 		// TODO Auto-generated method stub
 		Scanner keyboard = new Scanner(System.in);
-		FileOutputStream fileOut = new FileOutputStream("Users.ser");
-		ObjectOutputStream out = new ObjectOutputStream(fileOut);
+		ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(Paths.get("Users.ser"), StandardOpenOption.APPEND));
 		FileInputStream fileIn = new FileInputStream("Users.ser");
+		ObjectInputStream input = new ObjectInputStream(Files.newInputStream(Paths.get("Users.ser")));
 		
 		boolean sentinel = true;
 		while (sentinel) {
-			signUp(keyboard, fileOut, out);
+			signUp(keyboard, out);
 			System.out.print("\nWould You like to sign up again?: ");
 			String ans = keyboard.next();
 			if (!ans.equals("yes")) {
@@ -24,7 +25,7 @@ public class Main {
 		ArrayList<Users> users = new ArrayList<Users>();
 		boolean cont = true;
 		while (cont) {
-			try (ObjectInputStream input = new ObjectInputStream(fileIn)) {
+			try {
 				Users obj = (Users) input.readObject();
 				if (obj != null) {
 					System.out.println(obj);
@@ -38,11 +39,12 @@ public class Main {
 		}
 
 		out.close();
-		fileOut.close();
 		keyboard.close();
+		fileIn.close();
+		input.close();
 	}
 	
-	public static void signUp(Scanner keyboard, FileOutputStream fileOut, ObjectOutputStream out) throws IOException {
+	public static void signUp(Scanner keyboard, ObjectOutputStream out) throws IOException {
 		System.out.print("Enter Your Username: ");
 		String username = keyboard.next();
 		System.out.print("\nEnter Your Password: ");
